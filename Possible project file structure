@@ -1,0 +1,14 @@
+aios/
+├── README.md
+├── llm-core/
+│   └── core.py
+├── scli/
+│   └── cli.py
+├── llmctl/
+│   └── controller.py
+├── model_adapter_layer/
+│   └── adapter.py
+├── perm_broker/
+│   └── broker.py
+└── systemd/
+    └── llm-core.service
