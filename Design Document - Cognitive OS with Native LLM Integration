@@ -1,0 +1,141 @@
+Version: 0.1 (Draft)
+
+1. Overview
+
+This document describes the architecture and initial steps for building a prototype operating system (OS) that integrates a hot-swappable Large Language Model (LLM) as a native, system-level component. The LLM functions as a semantic interface layer, allowing users and processes to interact with the OS using natural language.
+
+2. Objectives
+
+Enable semantic OS-level interaction (e.g., "Computer, install Steam")
+
+Provide hot-swappable LLM support via an abstraction layer
+
+Maintain traditional programmatic control paths for fallback/debugging
+
+Support both CLI and GUI interaction paradigms
+
+Allow modular system composition via LLM-aware service hooks
+
+3. System Architecture
+
+3.1 Core Components
+
+Kernel (Base OS)
+
+A minimal Linux kernel (e.g., Alpine or Arch base)
+
+Userland utilities for standard POSIX compatibility
+
+LLM Runtime Service (llm-core)
+
+Runs as a systemd service or init-managed process
+
+Connects to local or remote LLM via a Model Adapter Layer
+
+Model Adapter Layer
+
+Supports OpenAI-compatible APIs (e.g., LM Studio, Ollama)
+
+Isolates prompt templates, capabilities, and memory handling
+
+Semantic Command Interface (SCI)
+
+Replaces shell or GUI prompt with natural language interpreter
+
+Executes validated instructions via syscall bridge
+
+Permission Broker (optional)
+
+Validates and approves potentially destructive actions
+
+Configurable per user and context
+
+4. LLM Agent Capabilities
+
+Semantic CLI interaction ("Find all files over 1GB")
+
+System configuration and package management ("Install Nginx")
+
+Application launching and window management
+
+User assistance and documentation lookup
+
+Script and automation generation
+
+5. Hot-Swapping Models
+
+Standard model contracts describe available capabilities
+
+Swapping handled via llmctl switch <model_id>
+
+Active memory/state saved and restored across swaps
+
+6. Security Considerations
+
+Run LLM in sandbox with strict I/O limits
+
+Log and review all executed commands via audit service
+
+Optional user approval layer for elevated permissions
+
+Use model cards to verify LLM origin and behavior contracts
+
+7. Initial VM Prototype Plan
+
+7.1 Requirements
+
+VirtualBox, VMware, or KVM
+
+Ubuntu Server 22.04 (or Alpine if going minimal)
+
+2 vCPU, 4GB RAM minimum
+
+Internet access or local LLM deployment (Ollama/LM Studio)
+
+7.2 Steps
+
+Create a new VM with Ubuntu Server
+
+Install basic dev tools: build-essential, git, curl, python3
+
+Install Ollama and a small LLM (e.g., llama3:8b)
+
+Create a system service llm-core.service that calls a wrapper script to interact with the LLM
+
+Build a minimal semantic CLI (scli) that:
+
+Takes user input
+
+Sends prompt to llm-core
+
+Parses LLM response and optionally asks for confirmation
+
+Executes safe shell commands with logging
+
+Optional: Add voice input with vosk or whisper.cpp
+
+8. Next Steps
+
+Define system prompt architecture and LLM instruction set
+
+Create prompt templates for system actions
+
+Build MVP of scli
+
+Harden model isolation and define swap spec
+
+9. Long-Term Vision
+
+OS as an intelligent agent with pluggable cognition
+
+Local-first but cloud-extendable
+
+GUI layer with semantic window manager
+
+Modular services with semantic contracts
+
+------------------------------------------------------------------------------------------------
+
+"Computer, please prepare the environment to run a gaming session with Steam, OBS, and Discord."
+
+This should not be science fiction any longer.
