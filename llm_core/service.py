@@ -1,7 +1,6 @@
 import argparse
 import logging
 import sys
-
 import requests
 
 
@@ -18,15 +17,24 @@ class LLMCoreService:
 
     def handle_prompt(self, prompt: str) -> str:
         """Send a prompt to the LLM and return its response."""
-        payload = {"model": self.model, "prompt": prompt}
+        payload = {
+            "model": self.model,
+            "prompt": prompt,
+            "stream": False
+        }
+
         try:
-            resp = requests.post(f"{self.base_url}/generate", json=payload, timeout=60)
-            resp.raise_for_status()
-            data = resp.json()
-            return data.get("response", "")
-        except Exception as exc:
-            logging.error("Failed to handle prompt: %s", exc)
-            return f"Error: {exc}"
+            response = requests.post(f"{self.base_url}/generate", json=payload, timeout=60)
+            response.raise_for_status()
+            data = response.json()
+            return data.get("response", "[No response in payload]")
+        except requests.exceptions.ConnectionError:
+            logging.error("LLM not available at %s", self.base_url)
+            return "⚠️ LLM is offline. Is Ollama running?"
+        except Exception as e:
+            logging.exception("Failed to handle prompt")
+            return f"❌ Error: {e}"
+
 
     def switch_model(self, model_name: str) -> None:
         """Switch the active model used for prompts."""
